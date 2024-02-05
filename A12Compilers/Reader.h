@@ -2,7 +2,7 @@
 ************************************************************
 * COMPILERS COURSE - Algonquin College
 * Code version: Fall, 2023
-* Author: Benjamin Gilstorf
+* Author: Benjamin Gilstorf / Bikku Byju Varughese
 * Professors: Paulo Sousa
 ************************************************************
 =---------------------------------------=
@@ -113,48 +113,48 @@ enum READER_MODE {
 
 /* Offset declaration */
 typedef struct position {
-	sofia_intg mark;			/* the offset to the mark position (in chars) */
-	sofia_intg read;			/* the offset to the get a char position (in chars) */
-	sofia_intg wrte;			/* the offset to the add chars (in chars) */
+	atys_intg mark;			/* the offset to the mark position (in chars) */
+	atys_intg read;			/* the offset to the get a char position (in chars) */
+	atys_intg wrte;			/* the offset to the add chars (in chars) */
 } Position;
 
 /* Buffer structure */
 typedef struct bufferReader {
-	sofia_string	content;			/* pointer to the beginning of character array (character buffer) */
-	sofia_intg		size;				/* current dynamic memory size (in bytes) allocated to character buffer */
-	sofia_intg		increment;			/* character array increment factor */
-	sofia_intg		mode;				/* operational mode indicator */
-	sofia_byte		flags;				/* contains character array reallocation flag and end-of-buffer flag */
+	atys_string	content;			/* pointer to the beginning of character array (character buffer) */
+	atys_intg		size;				/* current dynamic memory size (in bytes) allocated to character buffer */
+	atys_intg		increment;			/* character array increment factor */
+	atys_intg		mode;				/* operational mode indicator */
+	atys_byte		flags;				/* contains character array reallocation flag and end-of-buffer flag */
 	Position		position;				/* Offset / position field */
-	sofia_intg		histogram[NCHAR];	/* Statistics of chars */
-	sofia_intg		numReaderErrors;	/* Number of errors from Reader */
+	atys_intg		histogram[NCHAR];	/* Statistics of chars */
+	atys_intg		numReaderErrors;	/* Number of errors from Reader */
 } Buffer, *BufferPointer;
 
 /* FUNCTIONS DECLARATION:  .................................. */
 /* General Operations */
-BufferPointer	readerCreate		(sofia_intg, sofia_intg, sofia_intg);
-BufferPointer	readerAddChar		(BufferPointer const, sofia_char);
-sofia_boln		readerClear		    (BufferPointer const);
-sofia_boln		readerFree		    (BufferPointer const);
-sofia_boln		readerIsFull		(BufferPointer const);
-sofia_boln		readerIsEmpty		(BufferPointer const);
-sofia_boln		readerSetMark		(BufferPointer const, sofia_intg);
-sofia_intg		readerPrint		    (BufferPointer const);
-sofia_intg		readerLoad			(BufferPointer const, FILE* const);
-sofia_boln		readerRecover		(BufferPointer const);
-sofia_boln		readerRetract		(BufferPointer const);
-sofia_boln		readerRestore		(BufferPointer const);
+BufferPointer	readerCreate		(atys_intg, atys_intg, atys_intg);
+BufferPointer	readerAddChar		(BufferPointer const, atys_char);
+atys_boln		readerClear		    (BufferPointer const);
+atys_boln		readerFree		    (BufferPointer const);
+atys_boln		readerIsFull		(BufferPointer const);
+atys_boln		readerIsEmpty		(BufferPointer const);
+atys_boln		readerSetMark		(BufferPointer const, atys_intg);
+atys_intg		readerPrint		    (BufferPointer const);
+atys_intg		readerLoad			(BufferPointer const, FILE* const);
+atys_boln		readerRecover		(BufferPointer const);
+atys_boln		readerRetract		(BufferPointer const);
+atys_boln		readerRestore		(BufferPointer const);
 /* Getters */
-sofia_char		readerGetChar		(BufferPointer const);
-sofia_string	readerGetContent	(BufferPointer const, sofia_intg);
-sofia_intg		readerGetPosRead	(BufferPointer const);
-sofia_intg		readerGetPosWrte	(BufferPointer const);
-sofia_intg		readerGetPosMark	(BufferPointer const);
-sofia_intg		readerGetSize		(BufferPointer const);
-sofia_intg		readerGetInc		(BufferPointer const);
-sofia_intg		readerGetMode		(BufferPointer const);
-sofia_byte		readerGetFlags		(BufferPointer const);
-sofia_void		readerPrintStat		(BufferPointer const);
-sofia_intg		readerNumErrors		(BufferPointer const);
+atys_char		readerGetChar		(BufferPointer const);
+atys_string	readerGetContent	(BufferPointer const, atys_intg);
+atys_intg		readerGetPosRead	(BufferPointer const);
+atys_intg		readerGetPosWrte	(BufferPointer const);
+atys_intg		readerGetPosMark	(BufferPointer const);
+atys_intg		readerGetSize		(BufferPointer const);
+atys_intg		readerGetInc		(BufferPointer const);
+atys_intg		readerGetMode		(BufferPointer const);
+atys_byte		readerGetFlags		(BufferPointer const);
+atys_void		readerPrintStat		(BufferPointer const);
+atys_intg		readerNumErrors		(BufferPointer const);
 
 #endif

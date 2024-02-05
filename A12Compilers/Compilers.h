@@ -2,7 +2,7 @@
 ************************************************************
 * COMPILERS COURSE - Algonquin College
 * Code version: Fall, 2023
-* Author: TO_DO
+* Author: Benjamin Gilstorf / Bikku Byju Varughese
 * Professors: Paulo Sousa
 ************************************************************
 =---------------------------------------=
@@ -68,8 +68,8 @@
 #define STR_LANGNAME	"Atys"
 
 /* Logical constants - adapt for your language */
-#define SOFIA_TRUE  1
-#define SOFIA_FALSE 0
+#define ATYS_TRUE  1
+#define ATYS_FALSE 0
 
 /*
 ------------------------------------------------------------
@@ -81,17 +81,17 @@ NOTE: Some types may not be directly used by your language,
 
 
 /* TO_DO: Define your typedefs */
-typedef char			sofia_char;
-typedef char* sofia_string;
-typedef int				sofia_intg;
-typedef float			sofia_real;
-typedef void			sofia_void;
+typedef char			atys_char;
+typedef char* atys_string;
+typedef int				atys_intg;
+typedef float			atys_real;
+typedef void			atys_void;
 
-typedef unsigned char	sofia_boln;
-typedef unsigned char	sofia_byte;
+typedef unsigned char	atys_boln;
+typedef unsigned char	atys_byte;
 
-typedef long			sofia_long;
-typedef double			sofia_doub;
+typedef long			atys_long;
+typedef double			atys_doub;
 
 /*
 ------------------------------------------------------------
@@ -113,11 +113,11 @@ Main functions signatures
 (Code will be updated during next assignments)
 ------------------------------------------------------------
 */
-sofia_intg mainReader(sofia_intg argc, sofia_string* argv);
+atys_intg mainReader(atys_intg argc, atys_string* argv);
 
 /* 
 TO_DO: Include later mainScaner (A22) and mainParser (A32)
 */
-sofia_void printLogo();
+atys_void printLogo();
 
 #endif

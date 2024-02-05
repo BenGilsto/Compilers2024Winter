@@ -2,58 +2,22 @@
 ************************************************************
 * COMPILERS COURSE - Algonquin College
 * Code version: Fall, 2023
-* Author: Benjamin Gilstorf
+* Author: Benjamin Gilstorf / Bikku Byju Varughese
 * Professors: Paulo Sousa
 ************************************************************
-=---------------------------------------=
-|  COMPILERS - ALGONQUIN COLLEGE (F23)  |
-=---------------------------------------=
-|              ....                     |
-|          ........::.::::::.           |
-|        .:........::.:^^^~~~:          |
-|        :^^::::::^^^::^!7??7~^.        |
-|       .:^~~^!77777~~7?YY?7??7^.       |
-|       :.^~!??!^::::^^~!?5PY??!~.      |
-|       ~!!7J~.:::^^^^~!!~~?G5J?~       |
-|       :^~?!~7?Y57^^?PP5YJ!J5Y?:       |
-|       .~!!.:^!7!:.:7JYYJ7~7Y7^        |
-|       .~77..    . .~^:^^^~7?:         |
-|       .^!^~:::.:^!7?~^~!77J:          |
-|        ^^!Y~^^^^~?YJ77??7JJ^          |
-|       .^7J?~^~~^~7??7??7JY?~:         |
-|        ::^^~^7?!^~~!7???J?J7~:.       |
-|         ^~~!.^7YPPPP5Y?7J7777~.       |
-|        ..:~..:^!JPP5YJ?!777!^.        |
-| .~?JJJJJJJJJJYYYYYPPPPPPPPPPPP5PPYY~  |
-|  :!Y5GGG.___ YYYYYY__._.PPGGGGGG5!.   |
-|   :!Y5G / __| ___ / _(_)__ _ PGP5.    |
-|    :~75 \__ \/ _ \  _| / _` | 5?.     |
-|     7~7 |___/\___/_| |_\__,_| Y5?.    |
-|    .^~!~.....................P5YY7.   |
-|   .:::::::::::::?JJJJYYYYYYYYYJJJJ7.  |
-|                                       |
-=---------------------------------------=
-*/
+
 
 /*
 ***********************************************************
 * File name: Reader.c
 * Compiler: MS Visual Studio 2022
-* Course: CST 8152 � Compilers, Lab Section: [011, 012, 013]
+* Course: CST 8152   Compilers, Lab Section:012
 * Assignment: A12.
-* Date: May 01 2023
+* Date: Feb 04 2024
 * Professor: Paulo Sousa
 * Purpose: This file is the main code for Buffer/Reader (A12)
 ************************************************************
 */
-
-/*
- *.............................................................................
- * MAIN ADVICE:
- * - Please check the "TODO" labels to develop your activity.
- * - Review the functions to use "Defensive Programming".
- *.............................................................................
- */
 
 #ifndef COMPILERS_H_
 #include "Compilers.h"
@@ -85,32 +49,29 @@
 *************************************************************
 */
 
-BufferPointer readerCreate(sofia_intg size, sofia_intg increment, sofia_intg mode) {
+BufferPointer readerCreate(atys_intg size, atys_intg increment, atys_intg mode) {
 	BufferPointer readerPointer;
 	if (size < 0 || size > READER_MAX_SIZE)
 	{
 		return NULL;
 	}
-	if (size == 0){
+	if (size == 0) {
 		size = READER_DEFAULT_SIZE;
 		increment = READER_DEFAULT_INCREMENT;
 	}
-	
-	/* TO_DO: Adjust the values according to parameters */
+
+
 	readerPointer = (BufferPointer)calloc(1, sizeof(Buffer));
 	if (!readerPointer)
 		return NULL;
-	readerPointer->content = (sofia_string)malloc(size);
-	/* TO_DO: Defensive programming */
-	/* TO_DO: Initialize the histogram */
+	readerPointer->content = (atys_string)malloc(size);
+
 	for (int i = 0; i < NCHAR; i++)
 		readerPointer->histogram[i] = 0;
 	readerPointer->size = size;
 	readerPointer->increment = increment;
 	readerPointer->mode = mode;
-	/* TO_DO: Initialize flags */
-	/* TO_DO: The created flag must be signalized as EMP */
-	/* NEW: Cleaning the content */
+
 	if (readerPointer->content)
 		readerPointer->content[0] = READER_TERMINATOR;
 	readerPointer->position.wrte = 0;
@@ -136,15 +97,15 @@ BufferPointer readerCreate(sofia_intg size, sofia_intg increment, sofia_intg mod
 *************************************************************
 */
 
-BufferPointer readerAddChar(BufferPointer const readerPointer, sofia_char ch) {
-	sofia_intg newSize = 0;
-	/* Defensive programming */
+BufferPointer readerAddChar(BufferPointer const readerPointer, atys_char ch) {
+	atys_intg newSize = 0;
+
 	if (readerPointer == NULL || ch < 0 || ch >= NCHAR) {
 		return NULL; // Return NULL if the readerPointer is invalid or character is out of range
 	}
 
 	// Check if the buffer has space for the new character
-	if ((readerPointer->position.wrte + 1) * sizeof(sofia_char) > readerPointer->size) {
+	if ((readerPointer->position.wrte + 1) * sizeof(atys_char) > readerPointer->size) {
 		// Buffer is full; need to reallocate
 		switch (readerPointer->mode) {
 		case MODE_FIXED:
@@ -164,7 +125,7 @@ BufferPointer readerAddChar(BufferPointer const readerPointer, sofia_char ch) {
 		}
 
 		// Allocate new buffer with the calculated size
-		sofia_string newBuffer = (sofia_string)realloc(readerPointer->content, newSize);
+		atys_string newBuffer = (atys_string)realloc(readerPointer->content, newSize);
 		if (newBuffer == NULL) {
 			// Memory allocation failed, return NULL
 			return NULL;
@@ -199,12 +160,12 @@ BufferPointer readerAddChar(BufferPointer const readerPointer, sofia_char ch) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerClear(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
-	if (readerPointer == NULL){
-		return SOFIA_FALSE;
+atys_boln readerClear(BufferPointer const readerPointer) {
+
+	if (readerPointer == NULL) {
+		return ATYS_FALSE;
 	}
-	/* TO_DO: Adjust flags original */
+
 	readerPointer->position.wrte = readerPointer->position.mark = readerPointer->position.read = 0;
 	readerPointer->flags = READER_DEFAULT_FLAG;
 
@@ -212,8 +173,8 @@ sofia_boln readerClear(BufferPointer const readerPointer) {
 		readerPointer->histogram[i] = 0;
 	}
 	readerPointer->numReaderErrors = 0;
-	
-	return SOFIA_TRUE;
+
+	return ATYS_TRUE;
 }
 
 /*
@@ -230,22 +191,22 @@ sofia_boln readerClear(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerFree(BufferPointer const readerPointer) {
-	if (readerPointer == NULL){
-		return SOFIA_FALSE;
+atys_boln readerFree(BufferPointer const readerPointer) {
+	if (readerPointer == NULL) {
+		return ATYS_FALSE;
 	}
-	if (readerPointer->size == READER_MAX_SIZE){
-		return SOFIA_TRUE;
+	if (readerPointer->size == READER_MAX_SIZE) {
+		return ATYS_TRUE;
 	}
 	//De-allocate the reader content
-	if (readerPointer->content != NULL){
+	if (readerPointer->content != NULL) {
 		free(readerPointer->content);
 
-		readerPointer-> content = NULL;
+		readerPointer->content = NULL;
 	}
 	//De-allocate the reader pointer
 	if (readerPointer != NULL) free(readerPointer);
-	return SOFIA_TRUE;
+	return ATYS_TRUE;
 }
 
 /*
@@ -262,17 +223,17 @@ sofia_boln readerFree(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerIsFull(BufferPointer const readerPointer) {
+atys_boln readerIsFull(BufferPointer const readerPointer) {
 	if (readerPointer == NULL || readerPointer->content == NULL) {
-		return SOFIA_TRUE; // Error condition
+		return ATYS_TRUE; // Error condition
 	}
 
 	if (readerPointer->position.wrte >= readerPointer->size) {
-		return SOFIA_TRUE; // Buffer is full
+		return ATYS_TRUE; // Buffer is full
 	}
-	/* TO_DO: Check flag if buffer is FUL */
 
-	return SOFIA_FALSE;
+
+	return ATYS_FALSE;
 }
 
 
@@ -290,16 +251,16 @@ sofia_boln readerIsFull(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerIsEmpty(BufferPointer const readerPointer) {
-	if (readerPointer == NULL){
-		return SOFIA_FALSE;
+atys_boln readerIsEmpty(BufferPointer const readerPointer) {
+	if (readerPointer == NULL) {
+		return ATYS_FALSE;
 	}
 
-	if (readerPointer->position.wrte == 0 || (readerPointer->flags & FLAG_EMP)){
-		return SOFIA_TRUE;
+	if (readerPointer->position.wrte == 0 || (readerPointer->flags & FLAG_EMP)) {
+		return ATYS_TRUE;
 	}
-	/* TO_DO: Check flag if buffer is EMP */
-	return SOFIA_FALSE;
+
+	return ATYS_FALSE;
 }
 
 /*
@@ -317,19 +278,19 @@ sofia_boln readerIsEmpty(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerSetMark(BufferPointer const readerPointer, sofia_intg mark) {
-	/* TO_DO: Defensive programming */
+atys_boln readerSetMark(BufferPointer const readerPointer, atys_intg mark) {
+
 	if (readerPointer == NULL) {
-		return SOFIA_FALSE; // Cannot set mark on a NULL buffer
+		return ATYS_FALSE; // Cannot set mark on a NULL buffer
 	}
 
 	// Check if the mark is within the bounds of the buffer
 	if (mark < 0 || mark > readerPointer->position.wrte) {
-		return SOFIA_FALSE; // Mark is out of bounds
+		return ATYS_FALSE; // Mark is out of bounds
 	}
-	/* TO_DO: Adjust mark */
+
 	readerPointer->position.mark = mark;
-	return SOFIA_TRUE;
+	return ATYS_TRUE;
 }
 
 
@@ -347,12 +308,12 @@ sofia_boln readerSetMark(BufferPointer const readerPointer, sofia_intg mark) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerPrint(BufferPointer const readerPointer) {
-	sofia_intg cont = 0;
-	sofia_char c;
-	/* TO_DO: Defensive programming (including invalid chars) */
+atys_intg readerPrint(BufferPointer const readerPointer) {
+	atys_intg cont = 0;
+	atys_char c;
+
 	c = readerGetChar(readerPointer);
-	/* TO_DO: Check flag if buffer EOB has achieved */
+
 	while (cont < readerPointer->position.wrte) {
 		cont++;
 		printf("%c", c);
@@ -377,11 +338,11 @@ sofia_intg readerPrint(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerLoad(BufferPointer const readerPointer, FILE* const fileDescriptor) {
-	sofia_intg size = 0;
-	sofia_char c;
-	/* TO_DO: Defensive programming */
-	c = (sofia_char)fgetc(fileDescriptor);
+atys_intg readerLoad(BufferPointer const readerPointer, FILE* const fileDescriptor) {
+	atys_intg size = 0;
+	atys_char c;
+
+	c = (atys_char)fgetc(fileDescriptor);
 	while (!feof(fileDescriptor)) {
 		if (!readerAddChar(readerPointer, c)) {
 			ungetc(c, fileDescriptor);
@@ -390,7 +351,6 @@ sofia_intg readerLoad(BufferPointer const readerPointer, FILE* const fileDescrip
 		c = (char)fgetc(fileDescriptor);
 		size++;
 	}
-	/* TO_DO: Defensive programming */
 	return size;
 }
 
@@ -409,15 +369,14 @@ sofia_intg readerLoad(BufferPointer const readerPointer, FILE* const fileDescrip
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerRecover(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
-	// Defensive programming: Check if readerPointer is valid
+atys_boln readerRecover(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
-		return SOFIA_FALSE; // Operation failed due to invalid buffer pointer
-	}	/* TO_DO: Recover positions */
+		return ATYS_FALSE; // Operation failed due to invalid buffer pointer
+	}
 	readerPointer->position.read = 0;
 	readerPointer->position.mark = 0;
-	return SOFIA_TRUE;
+	return ATYS_TRUE;
 }
 
 
@@ -435,24 +394,19 @@ sofia_boln readerRecover(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerRetract(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
-	if (readerPointer == NULL) {
-		return SOFIA_FALSE; // Cannot retract a NULL buffer
-	}
+atys_boln readerRetract(BufferPointer const readerPointer) {
 
-	// Ensure there are characters to retract (read position > 0)
+	if (readerPointer == NULL) {
+		return ATYS_FALSE; // Cannot retract a NULL buffer
+	}
 	if (readerPointer->position.read > 0) {
 		// Decrement the read position by one
 		readerPointer->position.read--;
 
-		// If retracting makes sense in context of the 'mark' position,
-		// additional checks or adjustments can be made here
-
-		return SOFIA_FALSE; // Successfully retracted the read position
+		return ATYS_FALSE; // Successfully retracted the read position
 	}
-	/* TO_DO: Retract (return 1 pos read) */
-	return SOFIA_TRUE;
+
+	return ATYS_TRUE;
 }
 
 
@@ -470,20 +424,20 @@ sofia_boln readerRetract(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_boln readerRestore(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_boln readerRestore(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
-		return SOFIA_FALSE; // Cannot perform operation on a NULL buffer
+		return ATYS_FALSE; // Cannot perform operation on a NULL buffer
 	}
 
 	// Check for boundary condition: Ensure mark position is within valid range
 	// Assuming mark should not exceed the current write position
 	if (readerPointer->position.mark < 0 || readerPointer->position.mark > readerPointer->position.wrte) {
-		return SOFIA_FALSE; // Mark position is out of bounds
+		return ATYS_FALSE; // Mark position is out of bounds
 	}
-	/* TO_DO: Restore positions (read/mark) */
+
 	readerPointer->position.read = readerPointer->position.mark;
-	return SOFIA_TRUE;
+	return ATYS_TRUE;
 }
 
 
@@ -501,16 +455,13 @@ sofia_boln readerRestore(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_char readerGetChar(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
-	/* TO_DO: Check condition to read/wrte */
-	/* TO_DO: Set EOB flag */
-	/* TO_DO: Reset EOB flag */
+atys_char readerGetChar(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL || readerPointer->content == NULL) {
 		// Cannot proceed if the buffer or its content does not exist
 		return READER_TERMINATOR;
 	}
-	if (readerPointer->position.wrte>0)
+	if (readerPointer->position.wrte > 0)
 		return readerPointer->content[readerPointer->position.read++];
 	return READER_TERMINATOR;
 	if (readerPointer->position.read == readerPointer->position.wrte) {
@@ -546,8 +497,8 @@ sofia_char readerGetChar(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_string readerGetContent(BufferPointer const readerPointer, sofia_intg pos) {
-	/* TO_DO: Defensive programming */
+atys_string readerGetContent(BufferPointer const readerPointer, atys_intg pos) {
+
 	if (readerPointer == NULL || readerPointer->content == NULL) {
 		// If the buffer pointer or its content does not exist, return NULL.
 		return NULL;
@@ -558,8 +509,6 @@ sofia_string readerGetContent(BufferPointer const readerPointer, sofia_intg pos)
 		// If pos is out of bounds, return NULL to indicate an error or invalid request.
 		return NULL;
 	}
-
-	/* TO_DO: Return content (string) */
 	return (readerPointer->content + pos);
 }
 
@@ -579,15 +528,13 @@ sofia_string readerGetContent(BufferPointer const readerPointer, sofia_intg pos)
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetPosRead(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerGetPosRead(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
-		// If the buffer pointer does not exist, indicate an error or invalid state
-		// Here, we assume an error code is defined. If not, you might return -1 or another
-		// specific value designated to indicate errors in your system.
+
 		return READER_ERROR; // Ensure READER_ERROR is defined appropriately in your system
 	}
-	/* TO_DO: Return read */
+
 	return readerPointer->position.read;
 }
 
@@ -606,13 +553,11 @@ sofia_intg readerGetPosRead(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetPosWrte(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerGetPosWrte(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
 		return READER_ERROR; // Ensure READER_ERROR is defined as an error indication.
 	}
-	
-	/* TO_DO: Return wrte */
 	return readerPointer->position.wrte;
 }
 
@@ -631,13 +576,11 @@ sofia_intg readerGetPosWrte(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetPosMark(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerGetPosMark(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
 		return READER_ERROR; // Assuming READER_ERROR is defined as an error indication.
 	}
-	
-	/* TO_DO: Return mark */
 	return readerPointer->position.mark;;
 }
 
@@ -656,20 +599,15 @@ sofia_intg readerGetPosMark(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetSize(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
-	 // Defensive programming: Check if the buffer pointer exists
+atys_intg readerGetSize(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
-		// If the buffer pointer does not exist, return an error code or invalid value.
-		// Assuming READER_ERROR is defined in your system to represent such cases,
-		// or alternatively, return a specific value that clearly indicates an error.
+
 		return READER_ERROR; // Ensure READER_ERROR or a similar mechanism is defined appropriately.
 	}
 
-	// Return the current size (capacity) of the buffer.
 	return readerPointer->size;
-	/* TO_DO: Return size */
-	
+
 }
 
 /*
@@ -686,8 +624,7 @@ sofia_intg readerGetSize(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetInc(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerGetInc(BufferPointer const readerPointer) {
 	if (readerPointer == NULL) {
 		// If the buffer pointer does not exist, return an error code or invalid value.
 		// Assuming READER_ERROR is defined in your system to represent such cases.
@@ -696,8 +633,8 @@ sofia_intg readerGetInc(BufferPointer const readerPointer) {
 
 	// Return the increment value of the buffer.
 	return readerPointer->increment;
-	/* TO_DO: Return increment */
-	
+
+
 }
 
 /*
@@ -714,8 +651,8 @@ sofia_intg readerGetInc(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerGetMode(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerGetMode(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
 		return READER_ERROR; // Assuming READER_ERROR is defined as an error indication.
 	}
@@ -737,12 +674,10 @@ sofia_intg readerGetMode(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_byte readerGetFlags(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_byte readerGetFlags(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
-		// If the buffer pointer does not exist, return a default error value.
-		// Assuming an error flags value or 0 can signify an error in the context of flags.
-		// Adjust this based on your system's approach to flag errors or invalid states.
+
 		return 0; // Placeholder for error or invalid state in flags, adjust as necessary.
 	}
 	return readerPointer->flags;
@@ -755,15 +690,15 @@ sofia_byte readerGetFlags(BufferPointer const readerPointer) {
 * Function name: readerPrintStat
 * Purpose: Shows the char statistic.
 * Parameters:
-*   readerPointer = pointer to Buffer Reader		
+*   readerPointer = pointer to Buffer Reader
 * Return value: (Void)
 * TO_DO:
 *   - Use defensive programming
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_void readerPrintStat(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_void readerPrintStat(BufferPointer const readerPointer) {
+
 	if (readerPointer == NULL) {
 		printf("Error: Cannot print statistics for a NULL buffer.\n");
 		return; // Exit the function if the readerPointer is NULL
@@ -776,7 +711,7 @@ sofia_void readerPrintStat(BufferPointer const readerPointer) {
 	}
 
 	// Print the histogram for each character
-	printf("Character Statistics:\n");	
+	printf("Character Statistics:\n");
 	for (int i = 0; i < NCHAR; ++i) {
 		// Only print the characters that have appeared at least once
 		if (readerPointer->histogram[i] > 0) {
@@ -789,7 +724,6 @@ sofia_void readerPrintStat(BufferPointer const readerPointer) {
 			}
 		}
 	}
-	/* TO_DO: Print the histogram */
 }
 /*
 ***********************************************************
@@ -804,12 +738,10 @@ sofia_void readerPrintStat(BufferPointer const readerPointer) {
 *	- Adjust for your LANGUAGE.
 *************************************************************
 */
-sofia_intg readerNumErrors(BufferPointer const readerPointer) {
-	/* TO_DO: Defensive programming */
+atys_intg readerNumErrors(BufferPointer const readerPointer) {
 	if (readerPointer == NULL) {
 		// If readerPointer is NULL, return an error code or 0 if you do not have a defined error code
 		return READER_ERROR; // Assuming READER_ERROR is defined as an error code
 	}
-	/* TO_DO: Returns the number of errors */
 	return 0;
 }
