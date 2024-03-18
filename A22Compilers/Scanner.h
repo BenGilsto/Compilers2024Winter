@@ -74,7 +74,7 @@
 #define RTE_CODE 1  /* Value for run-time error */
 
 /* TO_DO: Define the number of tokens */
-#define NUM_TOKENS 16
+#define NUM_TOKENS 18
 
 /* TO_DO: Define Token codes - Create your token classes */
 enum TOKENS {
@@ -94,7 +94,6 @@ enum TOKENS {
 	RTE_T,   /* Run-time error token */
 	LOOP_T,  /* Logical Operator token*/
 	AROP_T,  /* Arithmetic operator token */
-	CMT_T,   /* Current token*/
 	REOP_T,	 /* Relational Operator token */
 	SEOF_T   /* Source end-of-file token */
 };
@@ -102,21 +101,23 @@ enum TOKENS {
 /* TO_DO: Define the list of keywords */
 static atys_string tokenStrTable[NUM_TOKENS] = {
 	"ERR_T",
-	"MNID_T",
-	"INL_T",
-	"STR_T",
+	"VID_T",
+	"FID_L",
+	"IL_T",
+	"SL_T",
 	"LPR_T",
 	"RPR_T",
 	"LBR_T",
 	"RBR_T",
 	"KW_T",
+	"OP_T",
+	"CM_T",
 	"EOS_T",
 	"RTE_T",
 	"LOOP_T",
 	"AROP_T",
 	"REOP_T",
-	"SEOF_T",
-	"CMT_T"
+	"SEOF_T"
 };
 
 /* TO_DO: Operators token attributes */
@@ -134,7 +135,7 @@ typedef union TokenAttribute {
 	EofOperator seofType;				/* source-end-of-file attribute code */
 	atys_intg intValue;				/* integer literal attribute (value) */
 	atys_intg keywordIndex;			/* keyword index in the keyword table */
-	//atys_int contentString;			/* string literal offset from the beginning of the string literal buffer (stringLiteralTable->content) */
+	atys_intg contentString;			/* string literal offset from the beginning of the string literal buffer (stringLiteralTable->content) */
 	atys_real floatValue;				/* floating-point literal attribute (value) */
 	atys_char stringValue[STR_LEN + 1];  /* String literal value */
 	atys_char idLexeme[VID_LEN + 1];	/* variable identifier token attribute */

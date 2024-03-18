@@ -192,7 +192,7 @@ Token tokenizer(atys_void) {
 			currentToken.code = RBR_T;
 			scData.scanHistogram[currentToken.code]++;
 			return currentToken;
-			//arithmetic symbols
+		//arithmetic symbols
 		case '+':
 			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
@@ -236,16 +236,16 @@ Token tokenizer(atys_void) {
 				} while (c != '\n' && c != CHARSEOF0 && c != CHARSEOF255);
 			break;
 		case '>':
-			currentToken.code = REOP_T;
 			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
+			currentToken.code = REOP_T;
 			scData.scanHistogram[currentToken.code]++;
 			currentToken.attribute.relationalOperator = GT;
 			return currentToken;
 		case '<':
-			currentToken.code = REOP_T;
 			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
+			currentToken.code = REOP_T;
 			scData.scanHistogram[currentToken.code]++;
 			currentToken.attribute.relationalOperator = LT;
 			return currentToken;
@@ -430,7 +430,13 @@ atys_intg nextClass(atys_char c) {
 
 Token funcCMT(atys_string lexeme) {
 	Token currentToken = { 0 };
-	currentToken.code = CMT_T;
+	atys_intg i = 0, len = (atys_intg)strlen(lexeme);
+	currentToken.attribute.contentString = readerGetPosWrte(stringLiteralTable);
+	for (i = 1; i < len - 1; i++) {
+		if (lexeme[i] == '\n')
+			line++;
+	}
+	currentToken.code = CM_T;
 	scData.scanHistogram[currentToken.code]++;
 	return currentToken;
 }
@@ -654,7 +660,7 @@ atys_void printToken(Token t) {
 	case KW_T:
 		printf("KW_T\t\t%s\n", keywordTable[t.attribute.codeType]);
 		break;
-	case CMT_T:
+	case CM_T:
 		printf("CMT_T\n");
 		break;
 	case EOS_T:
