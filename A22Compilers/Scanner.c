@@ -192,16 +192,16 @@ Token tokenizer(atys_void) {
 			currentToken.code = RBR_T;
 			scData.scanHistogram[currentToken.code]++;
 			return currentToken;
+		case ',':
+			break;
 		//arithmetic symbols
 		case '+':
-			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
 			currentToken.code = AROP_T;
 			scData.scanHistogram[currentToken.code]++;
 			currentToken.attribute.arithmeticOperator = ADD;
 			return currentToken;
 		case '-':
-			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
 			currentToken.code = AROP_T;
 			scData.scanHistogram[currentToken.code]++;
@@ -209,7 +209,6 @@ Token tokenizer(atys_void) {
 			return currentToken;
 			
 		case '*':
-			newc = readerGetChar(sourceBuffer);
 				currentToken.code = AROP_T;
 				scData.scanHistogram[currentToken.code]++;
 				currentToken.attribute.arithmeticOperator = MUL;
@@ -217,34 +216,14 @@ Token tokenizer(atys_void) {
 			//string literal
 		case '"':
 			break;
-			//comments
-		case '#':
-			newc = readerGetChar(sourceBuffer);
-			check = ATYS_FALSE;
-				do {
-					c = readerGetChar(sourceBuffer);
-					
-					if (c == CHARSEOF0 || c == CHARSEOF255) {
-						readerRetract(sourceBuffer);
-					}
-					else if (c == '\n') {
-						line++;
-					}
-					else if (c == '#') {
-						check = ATYS_TRUE;
-					}
-				} while (c != '\n' && c != CHARSEOF0 && c != CHARSEOF255);
-			break;
 		case '>':
-			newc = readerGetChar(sourceBuffer);
 			readerRetract(sourceBuffer);
 			currentToken.code = REOP_T;
 			scData.scanHistogram[currentToken.code]++;
 			currentToken.attribute.relationalOperator = GT;
 			return currentToken;
 		case '<':
-			newc = readerGetChar(sourceBuffer);
-			readerRetract(sourceBuffer);
+				readerRetract(sourceBuffer);
 			currentToken.code = REOP_T;
 			scData.scanHistogram[currentToken.code]++;
 			currentToken.attribute.relationalOperator = LT;
@@ -263,7 +242,7 @@ Token tokenizer(atys_void) {
 				scData.scanHistogram[currentToken.code]++;
 				currentToken.attribute.relationalOperator = EQ;
 				return currentToken;
-		case '&':
+		/*case '&':
 			newc = readerGetChar(sourceBuffer);
 			if (newc == '&') { // &&
 				currentToken.code = LOOP_T;
@@ -278,7 +257,7 @@ Token tokenizer(atys_void) {
 				scData.scanHistogram[currentToken.code]++;
 				currentToken.attribute.logicalOperator = OR;
 				return currentToken;
-			}
+			} */
 
 		/* Cases for END OF FILE */
 		case CHARSEOF0:
@@ -420,13 +399,14 @@ atys_intg nextClass(atys_char c) {
 	return val;
 }
 
+
 /*
  ************************************************************
  * Acceptance State Function COM
  *		Function responsible to identify COM (comments).
  ***********************************************************
  */
- /* TO_DO: Adjust the function for IL */
+ /* TO_DO: Adjust the function for COM */
 
 Token funcCMT(atys_string lexeme) {
 	Token currentToken = { 0 };
@@ -456,16 +436,16 @@ Token funcCMT(atys_string lexeme) {
 
 Token funcIL(atys_string lexeme) {
 	Token currentToken = { 0 };
-	atys_long tlong;
+	atys_intg tint;
 	if (lexeme[0] != '\0' && strlen(lexeme) > NUM_LEN) {
 		currentToken = (*finalStateTable[ESNR])(lexeme);
 	}
 	else {
-		tlong = atol(lexeme);
-		if (tlong >= 0 && tlong <= SHRT_MAX) {
+		tint = atol(lexeme);
+		if (tint >= 0 && tint <= SHRT_MAX) {
 			currentToken.code = IL_T;
 			scData.scanHistogram[currentToken.code]++;
-			currentToken.attribute.intValue = (atys_intg)tlong;
+			currentToken.attribute.intValue = (atys_intg)tint;
 		}
 		else {
 			currentToken = (*finalStateTable[ESNR])(lexeme);
@@ -496,7 +476,7 @@ Token funcID(atys_string lexeme) {
 	atys_intg isID = ATYS_FALSE;
 	switch (lastch) {
 		case MNID_SUF:
-			currentToken.code = VID_T;
+			currentToken.code = MNID_T;
 			scData.scanHistogram[currentToken.code]++;
 			isID = ATYS_TRUE;
 			break;
@@ -529,7 +509,7 @@ Token funcID(atys_string lexeme) {
 Token funcSL(atys_string lexeme) {
 	Token currentToken = { 0 };
 	atys_intg i = 0, len = (atys_intg)strlen(lexeme);
-	//currentToken.attribute.contentString = readerGetPosWrte(stringLiteralTable);
+	currentToken.attribute.contentString = readerGetPosWrte(stringLiteralTable);
 	for (i = 1; i < len - 1; i++) {
 		if (lexeme[i] == '\n')
 			line++;
@@ -565,14 +545,14 @@ Token funcSL(atys_string lexeme) {
 Token funcKEY(atys_string lexeme) {
 	Token currentToken = { 0 };
 	atys_intg kwindex = -1, j = 0;
-	atys_intg len = (atys_intg)strlen(lexeme);
-	lexeme[len - 1] = '\0';
+	//atys_intg len = (atys_intg)strlen(lexeme);
+	//lexeme[len - 1] = '\0';
 	for (j = 0; j < KWT_SIZE; j++)
 		if (!strcmp(lexeme, &keywordTable[j][0]))
 			kwindex = j;
 	if (kwindex != -1) {
 		currentToken.code = KW_T;
-		scData.scanHistogram[currentToken.code]++;
+		//scData.scanHistogram[currentToken.code]++;
 		currentToken.attribute.codeType = kwindex;
 	}
 	else {
@@ -638,8 +618,11 @@ atys_void printToken(Token t) {
 	case SEOF_T:
 		printf("SEOF_T\t\t%d\t\n", t.attribute.seofType);
 		break;
-	case VID_T:
+	case MNID_T:
 		printf("MNID_T\t\t%s\n", t.attribute.idLexeme);
+		break;
+	case VID_T:
+		printf("VID_T\t\t%s\n", t.attribute.idLexeme);
 		break;
 	case SL_T:
 		printf("STR_T\t\t%d\t ", (atys_intg)t.attribute.codeType);

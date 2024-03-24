@@ -66,7 +66,7 @@
 /*#pragma warning(error:4001)*/	/* to enforce C89 comments - to make // comments an error */
 
 /* Constants */
-#define VID_LEN 20  /* variable identifier length */
+#define VID_LEN 20  /* Variable identifier length */
 #define ERR_LEN 40  /* error message length */
 #define NUM_LEN 5   /* maximum number of digits for IL */
 #define STR_LEN 20  /* String literal length */
@@ -79,8 +79,7 @@
 /* TO_DO: Define Token codes - Create your token classes */
 enum TOKENS {
 	ERR_T,   /* Error token */
-	VID_T,   /* Variable identifier token */
-	FID_T,   /* Function identifier token */
+	MNID_T,  /* Method identifier token */
 	IL_T,    /* Integer literal token */
 	SL_T,    /* String literal token */
 	LPR_T,	 /* Left parenthesis token */
@@ -91,6 +90,7 @@ enum TOKENS {
 	OP_T,    /* Operator token */
 	CM_T,    /* Comment token */
 	EOS_T,   /* End of statement token */
+	VID_T,   /* Variable identifier token */
 	RTE_T,   /* Run-time error token */
 	LOOP_T,  /* Logical Operator token*/
 	AROP_T,  /* Arithmetic operator token */
@@ -101,8 +101,7 @@ enum TOKENS {
 /* TO_DO: Define the list of keywords */
 static atys_string tokenStrTable[NUM_TOKENS] = {
 	"ERR_T",
-	"VID_T",
-	"FID_L",
+	"MNID_T",
 	"IL_T",
 	"SL_T",
 	"LPR_T",
@@ -113,6 +112,7 @@ static atys_string tokenStrTable[NUM_TOKENS] = {
 	"OP_T",
 	"CM_T",
 	"EOS_T",
+	"VID_T",
 	"RTE_T",
 	"LOOP_T",
 	"AROP_T",
@@ -137,8 +137,7 @@ typedef union TokenAttribute {
 	atys_intg keywordIndex;			/* keyword index in the keyword table */
 	atys_intg contentString;			/* string literal offset from the beginning of the string literal buffer (stringLiteralTable->content) */
 	atys_real floatValue;				/* floating-point literal attribute (value) */
-	atys_char stringValue[STR_LEN + 1];  /* String literal value */
-	atys_char idLexeme[VID_LEN + 1];	/* variable identifier token attribute */
+	atys_char idLexeme[VID_LEN + 1];	/* method identifier token attribute */
 	atys_char errLexeme[ERR_LEN + 1];	/* error token attribite */
 } TokenAttribute;
 
@@ -154,7 +153,7 @@ typedef struct idAttibutes {
 
 /* Token declaration */
 typedef struct Token {
-	atys_intg code;				/* token code */
+	atys_intg code;				/* token */
 	TokenAttribute attribute;	/* token attribute */
 	IdAttibutes   idAttribute;	/* not used in this scanner implementation - for further use */
 } Token;
@@ -190,37 +189,55 @@ typedef struct scannerData {
 #define FS		10		/* Illegal state */
 
  /* TO_DO: State transition table definition */
-#define NUM_STATES		8
-#define CHAR_CLASSES	6
+#define NUM_STATES		10
+#define CHAR_CLASSES	8
 
 /* TO_DO: Transition table - type of states defined in separate table */
 static atys_intg transitionTable[NUM_STATES][CHAR_CLASSES] = {
-	/* [L(A-Z)] [D(0-9)] [U(_)] [M(&)] [O(')] [other] */
-	   {        1,       6,   ESNR,  ESNR,      4,   ESNR}, /* S0 */
-	   {        1,       1,      1,     2,      3,      3}, /* S1 */
-	   {       FS,      FS,     FS,    FS,     FS,     FS}, /* S2 */
-	   {       FS,      FS,     FS,    FS,     FS,     FS}, /* S3 */
-	   {        4,       4,      4,     4,      5,      4}, /* S4 */
-	   {       FS,      FS,     FS,    FS,     FS,     FS}, /* S5 */
-	   {       FS,       6,     FS,    FS,     FS,      7}, /* S6 */
-	   {       FS,      FS,     FS,    FS,     FS,     FS}  /* S7 */
+	/*   [L(A-Z)]  [D(0-9)] [U(_)] [M(&)]  [Q(\)]  [SEOF] [C(#)] [other] */
+//	   {1,    ESNR,   ESNR,  ESNR,      4,   ESWR,    6,  ESNR},    /* S0 */
+//	   {        1,       1,      1,     2,      3,      3,    3,     3},    /* S1 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,    FS},    /* S2 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,    FS},    /* S3 */
+//	   {        4,       4,      4,     4,      5,   ESWR,    4,     4},    /* S4 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,    FS},    /* S5 */
+//	   {        6,       6,      6,     6,      6,   ESWR,    7,     6},    /* S6 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS},   /* S7 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS},   /* S8 */
+//	   {       FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS},   /* S9 */
+//}; 
+
+/*   [L(A-Z)]  [D(0-9)] [U(_)] [M(&)]  [Q(\)]  [SEOF] [C(#)] [other] */
+	{ 1, ESNR, ESNR, ESNR, 4, ESWR, 6, ESNR},    /* S0 */
+	{ 1,       1,      1,     2,      3,      3,    3,       3 },    /* S1 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },    /* S2 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },    /* S3 */
+	{ 4,       4,      4,     4,      5,   ESWR,    4,       4 },    /* S4 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },    /* S5 */
+	{ 6,       6,      6,     6,      6,   ESWR,    7,       6 },    /* S6 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },   /* S7 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },   /* S8 */
+	{ FS,      FS,     FS,    FS,     FS,     FS,   FS,     FS },   /* S9 */
 };
 
 /* Define accepting states types */
 #define NOAS	0		/* not accepting state */
-#define ASNR	2		/* accepting state with no retract */
-#define ASWR	1		/* accepting state with retract */
+#define ASNR	1		/* accepting state with no retract */
+#define ASWR	2		/* accepting state with retract */
 
 /* TO_DO: Define list of acceptable states */
 static atys_intg stateType[NUM_STATES] = {
-	 NOAS, /* S0 */
-	ASNR, /* S1 */
-	ASWR, /* S2 */
-	ASWR, /* S3 */
+	NOAS, /* S0 */
+	NOAS, /* S1 */
+	ASNR, /* S2 methods */
+	ASWR, /* S3 key */
 	NOAS, /* S4 */
-	ASWR, /* S5 */
+	ASNR, /* S5 string literal*/
 	NOAS, /* S6 */
-	ASNR  /* S7 */
+	ASNR, /* S7 */
+	ASNR, /* S8 */
+	ASWR  /* S9 */
+
 };
 
 /*
@@ -248,12 +265,12 @@ Automata definitions
 typedef Token(*PTR_ACCFUN)(atys_string lexeme);
 
 /* Declare accepting states functions */
-Token funcSL(char* lexeme);
-Token funcIL(char* lexeme);
-Token funcID(char* lexeme);
-Token funcCMT(char* lexeme);
-Token funcKEY(char* lexeme);
-Token funcErr(char* lexeme);
+Token funcSL(atys_string lexeme);
+Token funcIL(atys_string lexeme);
+Token funcID(atys_string lexeme);
+Token funcCMT(atys_string lexeme);
+Token funcKEY(atys_string lexeme);
+Token funcErr(atys_string lexeme);
 
 /*
  * Accepting function (action) callback table (array) definition
@@ -262,14 +279,16 @@ Token funcErr(char* lexeme);
 
  /* TO_DO: Define final state table */
 static PTR_ACCFUN finalStateTable[NUM_STATES] = {
-	NULL,   /* S0 */
-	funcID, /* S1 */
-	NULL,   /* S2 */
-	NULL,   /* S3 */
-	NULL,   /* S4 */
-	funcSL, /* S5 */
-	NULL,   /* S6 */
-	funcIL  /* S7 */
+	NULL,     /* S0 */
+	NULL,     /* S1 */
+	funcID,   /* S2 */
+	funcKEY,  /* S3 */
+	NULL,     /* S4 */
+	funcSL,   /* S5 */
+	NULL,     /* S6 */
+	funcCMT,  /* S7 */
+	funcErr,  /* S8 */
+	funcErr   /* S9 */
 };
 
 /*
@@ -308,7 +327,7 @@ typedef struct languageAttributes {
 	atys_char indentationCharType;
 	atys_intg indentationCurrentPos;
 	/* TO_DO: Include any extra attribute to be used in your scanner (OPTIONAL and FREE) */
-} LanguageAttributes;
+} LanguageAttributes;	
 
 /* Number of errors */
 atys_intg numScannerErrors;
